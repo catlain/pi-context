@@ -17,7 +17,9 @@
   "devDependencies": {
     "vitest": "^3.1.0"
   },
-  "piExtension": true,
+  "pi": {
+    "extensions": ["."]
+  },
   "keywords": [
     "pi-package"
   ],
