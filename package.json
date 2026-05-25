@@ -9,7 +9,6 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@earendil-works/pi-coding-agent": "github:earendil-works/pi-coding-agent",
     "@pi-atelier/shared-utils": "github:catlain/pi-shared-utils"
   },
   "bundledDependencies": [
@@ -19,5 +18,19 @@
     "vitest": "^3.1.0"
   },
   "piExtension": true,
-  "keywords": ["pi", "context", "distill", "tool-result", "formatter"]
+  "keywords": [
+    "pi-package"
+  ],
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": ">=1.0.0",
+    "@earendil-works/pi-tui": ">=1.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@earendil-works/pi-coding-agent": {
+      "optional": true
+    },
+    "@earendil-works/pi-tui": {
+      "optional": true
+    }
+  }
 }
