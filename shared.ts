@@ -76,7 +76,10 @@ export const setContextConfig = (patch: Partial<ContextConfig>): ContextConfig =
 // ── 录制 ──
 let recording = false;
 export function isRecording() { return recording; }
-export function setRecording(v: boolean) { recording = v; }
+export function setRecording(v: boolean | (() => boolean)): boolean {
+	recording = typeof v === 'function' ? v() : v;
+	return recording;
+}
 export function cleanRecordings() {
 	if (existsSync(RECORDINGS_DIR)) {
 		for (const f of readdirSync(RECORDINGS_DIR)) rmSync(join(RECORDINGS_DIR, f), { recursive: true, force: true });
