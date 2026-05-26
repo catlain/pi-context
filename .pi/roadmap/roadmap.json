@@ -1,0 +1,53 @@
+{
+  "source": "tooling-guardrails",
+  "syncedAt": "2026-05-26",
+  "stories": [
+    {
+      "id": "E5.S1",
+      "title": "MCP 工具输出 formatter 扩展 + 内容管理策略",
+      "description": "扩展 tool-result-processor 的 formatter 体系，覆盖 Godot MCP 和 code-graph 的大输出场景：\n\n1. **Godot MCP formatter**：识别场景树（scene_tree）、节点属性（inspect_node）、方法返回值（call_method）等输出，实现：\n   - 场景树：层级压缩（只保留前 N 个子节点 + \"...N more\"）\n   - 节点属性：按属性类型分组摘要\n   - 方法返回值：截断长输出\n\n2. **code-graph formatter 增强**：现有 formatCodeGraphResult 只处理 search/callgraph/references/impact/module 模式，需要增加：\n   - get_ast_node 完整源码输出：默认压缩为签名 + 关键行，源码存临时文件\n   - module_overview 大目录输出：排序后截断\n\n3. **通用 MCP 内容管理**：\n   - 分析 MCP 工具输出格式特征，建立嗅探规则\n   - 按工具类型设定不同的 preview 行数和压缩策略\n   - 确保 MCP 工具结果走 tool_result 事件链（验证 mcp-lite registerTool 路径）\n\n4. **验证**：在 fuse-bead-puzzle 项目中实测 Godot MCP 输出压缩效果",
+      "status": "todo",
+      "createdDate": "2026-05-26",
+      "tasks": [
+        {
+          "id": "E5.S1.T1",
+          "title": "验证 MCP 工具结果走 tool_result 事件链",
+          "status": "done",
+          "priority": "high",
+          "createdDate": "2026-05-26",
+          "doneDate": "2026-05-26",
+          "doneBySessionId": "2026-05-26T14-27-50-937Z_019e64af-4e19-78ef-bd74-b81143e53966",
+          "note": "验证通过：MCP registerTool 的 execute 结果走 afterToolCall → emitToolResult → context-manager handler 完整链路。问题在 formatter 嗅探规则不识别 MCP 输出格式，不在事件链。"
+        },
+        {
+          "id": "E5.S1.T2",
+          "title": "实现 Godot MCP 输出 formatter（场景树压缩 + 节点属性摘要）",
+          "status": "todo",
+          "priority": "high",
+          "createdDate": "2026-05-26"
+        },
+        {
+          "id": "E5.S1.T3",
+          "title": "增强 code-graph formatter：覆盖 get_ast_node 和 module_overview 大输出",
+          "status": "todo",
+          "priority": "high",
+          "createdDate": "2026-05-26"
+        },
+        {
+          "id": "E5.S1.T4",
+          "title": "实现通用 MCP 输出嗅探规则和按工具类型的压缩策略",
+          "status": "todo",
+          "priority": "medium",
+          "createdDate": "2026-05-26"
+        },
+        {
+          "id": "E5.S1.T5",
+          "title": "在 fuse-bead-puzzle 项目实测 Godot MCP + code-graph 输出压缩效果",
+          "status": "todo",
+          "priority": "medium",
+          "createdDate": "2026-05-26"
+        }
+      ]
+    }
+  ]
+}

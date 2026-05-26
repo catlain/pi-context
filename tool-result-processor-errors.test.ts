@@ -112,7 +112,8 @@ describe("阈值边界", () => {
 	it("小内容接近但不超阈值时保留全文", () => {
 		const { pi, triggerToolResult } = createMockPi();
 		registerToolResultProcessor(pi as any, { distillThreshold: 4000 });
-		const nearThreshold = "N".repeat(15900);
+		// 注意：字符数必须 < CHAR_HARD_LIMIT (8000)，否则会触发字符数硬限制
+		const nearThreshold = "N".repeat(3500); // ~875 tokens < 4000
 		const rawText = JSON.stringify({
 			title: "接近阈值",
 			url: "https://x.com",

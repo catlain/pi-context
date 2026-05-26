@@ -11,6 +11,7 @@ import {
 	formatWebSearchResult,
 } from "./formatters.js";
 import { formatCodeGraphResult } from "./formatters-codegraph.js";
+import { formatMcpJsonResult } from "./formatters-mcp-json.js";
 import {
 	extractBashSourcePath,
 	PROCESSOR_DIR,
@@ -48,6 +49,11 @@ const DEFAULT_THRESHOLD = 4000;
 const SKIP_TOOLS = new Set(["edit", "write"]);
 const PREVIEW_LINES = 15;
 
+// 字符数硬限制：超过此长度一律进入大结果处理，不管 token 估算结果
+// 背景：estimateTokens 用 length/4 低估结构化文本（如 Godot MCP 的 JSON 输出），
+// 导致 8K~16K 字符的内容（估算 ~2000~4000 tokens）绕过压缩
+const CHAR_HARD_LIMIT = 8000;
+
 // ── 核心处理 ──────────────────────────────────────
 
 export function processToolResult(
@@ -84,6 +90,7 @@ export function processToolResult(
 		formatGhResult,
 		formatWebReadResult,
 		formatCodeGraphResult,
+		formatMcpJsonResult,
 	] as const;
 	let formatted = rawText;
 	for (const fn of formatters) {
@@ -111,8 +118,13 @@ export function processToolResult(
 		sessionId,
 	);
 
-	// 小结果：格式化文本 + 原文路径
-	if (tokens < threshold) {
+	// 小结果判定：token 阈值 + 字符数硬限制双重检查
+	// 字符数硬限制兜底：estimateTokens 用 length/4 低估结构化文本
+	// 字符数硬限制：兜底 estimateTokens 用 length/4 低估结构化文本的问题
+	// 基于 threshold 放大：默认 4000 → 8000 字符，用户设高阈值时按比例放大
+	const charHardLimit = Math.max(CHAR_HARD_LIMIT, threshold * 2);
+	const forceLarge = rawText.length > charHardLimit;
+	if (tokens < threshold && !forceLarge) {
 		let smallResult = fillTemplate(hintsConfig.processorSmallResult, {
 			formatted,
 			tmpPath: tmpPath ?? "",

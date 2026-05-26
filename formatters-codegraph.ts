@@ -31,6 +31,13 @@ const SYMBOL_ORDER: Record<string, number> = {
 	module: 9,
 };
 
+// ── AST JSON code_content 截断阈值 ────────────────
+
+// code_content 超过此行数时截断为签名 + 头尾摘要
+const CODE_CONTENT_MAX_LINES = 40;
+const CODE_CONTENT_HEAD = 15;
+const CODE_CONTENT_TAIL = 5;
+
 // ── 嗅探：检测 code-graph 输出 ────────────────────
 
 export function sniffCodeGraph(text: string): boolean {
@@ -49,8 +56,27 @@ export function sniffCodeGraph(text: string): boolean {
 		// dead code: "Dead code: 42 results"
 		/^Dead code:\s+\d+\s+results?/m.test(text) ||
 		// module overview header: "Module: xxx (42 nodes)"
-		/^Module:\s+\S+\s*\(\d+\s+nodes?\)/m.test(text)
+		/^Module:\s+\S+\s*\(\d+\s+nodes?\)/m.test(text) ||
+		// AST JSON: get_ast_node 返回的 JSON（含 code_content 或 compact 字段）
+		sniffAstJson(text)
 	);
+}
+
+/** 检测 code-graph get_ast_node 的 JSON 输出 */
+function sniffAstJson(text: string): boolean {
+	// 快速排除：明显不是 JSON
+	if (!text.startsWith("{")) return false;
+	try {
+		const obj = JSON.parse(text);
+		// code-graph AST JSON 必须有 name + file_path，且至少有 type 或 signature
+		return (
+			typeof obj.name === "string" &&
+			typeof obj.file_path === "string" &&
+			(typeof obj.type === "string" || typeof obj.signature === "string")
+		);
+	} catch {
+		return false;
+	}
 }
 
 // ── 搜索结果分组排序 ─────────────────────────────
@@ -65,10 +91,65 @@ function sortSearchLines(lines: string[]): string[] {
 	});
 }
 
+// ── AST JSON 格式化 ────────────────────────────
+
+/** 格式化 get_ast_node 的 JSON 输出：截断长 code_content */
+function formatAstJson(text: string): string {
+	let obj: any;
+	try {
+		obj = JSON.parse(text);
+	} catch {
+		return text;
+	}
+
+	const code = obj.code_content as string | undefined;
+	if (!code || typeof code !== "string") {
+		// 无 code_content → 保留元信息，格式化输出
+		return formatAstMetadata(obj);
+	}
+
+	const codeLines = code.split("\n");
+	if (codeLines.length <= CODE_CONTENT_MAX_LINES) {
+		// 短 code_content 保持完整
+		return text;
+	}
+
+	// 截断：头 + 省略提示 + 尾
+	const head = codeLines.slice(0, CODE_CONTENT_HEAD);
+	const tail = codeLines.slice(-CODE_CONTENT_TAIL);
+	const truncated =
+		head.join("\n") +
+		`\n... (${codeLines.length - CODE_CONTENT_HEAD - CODE_CONTENT_TAIL} lines truncated)\n` +
+		tail.join("\n");
+
+	// 重建 JSON：保留元信息 + 截断后的 code_content
+	const result = { ...obj, code_content: truncated };
+	return JSON.stringify(result, null, 2);
+}
+
+/** 提取 AST JSON 的元信息为可读格式 */
+function formatAstMetadata(obj: any): string {
+	const parts: string[] = [];
+	if (obj.name) parts.push(`name: ${obj.name}`);
+	if (obj.type) parts.push(`type: ${obj.type}`);
+	if (obj.file_path) parts.push(`file: ${obj.file_path}`);
+	if (obj.start_line) parts.push(`lines: ${obj.start_line}-${obj.end_line ?? "?"}`);
+	if (obj.signature) parts.push(`signature: ${obj.signature}`);
+	if (obj.node_id) parts.push(`node_id: ${obj.node_id}`);
+	if (obj.compact) parts.push(`(compact)`);
+	return parts.join("\n");
+}
+
 // ── 主格式化 ─────────────────────────────────────
 
 export function formatCodeGraphResult(text: string): string {
 	if (!text) return text;
+
+	// AST JSON 格式（get_ast_node）
+	if (sniffAstJson(text)) {
+		return formatAstJson(text);
+	}
+
 	if (!sniffCodeGraph(text)) return text;
 
 	let lines = text.split("\n");
