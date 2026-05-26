@@ -11,9 +11,6 @@
   "dependencies": {
     "@pi-atelier/shared-utils": "github:catlain/pi-shared-utils"
   },
-  "bundledDependencies": [
-    "@pi-atelier/shared-utils"
-  ],
   "devDependencies": {
     "vitest": "^3.1.0"
   },
