@@ -39,5 +39,14 @@
   },
   "bundleDependencies": [
     "@pi-atelier/shared-utils"
+  ],
+  "files": [
+    "*.ts",
+    "tests/",
+    "README.md",
+    "README.en.md",
+    "tsconfig.json",
+    "vitest.config.ts",
+    "package.json"
   ]
 }

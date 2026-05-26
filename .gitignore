@@ -5,3 +5,4 @@ dist/
 !vitest.config.ts
 *.d.ts
 *.map
+package-lock.json
