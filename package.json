@@ -1,0 +1,38 @@
+{
+  "name": "pi-context-manager",
+  "version": "1.0.0",
+  "description": "Context management, distillation, payload recording and analysis for pi-coding-agent",
+  "main": "index.ts",
+  "types": "index.ts",
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@pi-atelier/shared-utils": "github:catlain/pi-shared-utils"
+  },
+  "bundledDependencies": [
+    "@pi-atelier/shared-utils"
+  ],
+  "devDependencies": {
+    "vitest": "^3.1.0"
+  },
+  "pi": {
+    "extensions": ["."]
+  },
+  "keywords": [
+    "pi-package"
+  ],
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": ">=1.0.0",
+    "@earendil-works/pi-tui": ">=1.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@earendil-works/pi-coding-agent": {
+      "optional": true
+    },
+    "@earendil-works/pi-tui": {
+      "optional": true
+    }
+  }
+}
