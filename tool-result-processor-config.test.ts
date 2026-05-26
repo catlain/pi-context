@@ -51,7 +51,7 @@ describe("阈值配置读取", () => {
 
 		const text = result.content[0].text;
 		expect(text).toContain("[processed]");
-		expect(text).toContain("/tmp/pi-distill/processor/");
+		expect(text).toContain(".pi/agent/distill/processor/");
 	});
 
 	it("自定义更高阈值时小内容保留全文", () => {

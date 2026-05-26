@@ -107,7 +107,7 @@ describe("大结果（≥ 阈值）", () => {
 		const text = result.content[0].text;
 		expect(text).toContain("[processed]");
 		expect(text).toContain("web_read");
-		expect(text).toContain("/tmp/pi-distill/processor/");
+		expect(text).toContain(".pi/agent/distill/processor/");
 		expect(text).toContain("tokens");
 	});
 
@@ -129,7 +129,7 @@ describe("大结果（≥ 阈值）", () => {
 		const text = result.content[0].text;
 		expect(text).toMatch(/\[processed\]/);
 		expect(text).toMatch(/web_read/);
-		expect(text).toMatch(/\/tmp\/pi-distill\/processor\//);
+		expect(text).toContain(".pi/agent/distill/processor/");
 		expect(text).toMatch(/\d+k? tokens/);
 	});
 
@@ -148,7 +148,7 @@ describe("大结果（≥ 阈值）", () => {
 		});
 
 		const text = result.content[0].text;
-		expect(text).toContain("/tmp/pi-distill/processor/web_read-");
+		expect(text).toContain(".pi/agent/distill/processor/web_read-");
 		expect(text).toContain(".txt");
 	});
 });

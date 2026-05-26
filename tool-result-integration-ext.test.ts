@@ -57,7 +57,7 @@ describe("后处理器输出不被 distill 二次蒸馏", () => {
 // ── 临时文件目录共存 ───────────────────────────────
 
 describe("临时文件目录共存", () => {
-	it("大结果后处理写 /tmp/pi-distill/processor/ 子目录", () => {
+	it("大结果后处理写 .pi/agent/distill/processor/ 子目录", () => {
 		const handler = createHandler();
 		const bigText = "X".repeat(20000);
 		const rawText = JSON.stringify({ title: "大文件", url: "https://x.com", content: bigText });
@@ -69,7 +69,7 @@ describe("临时文件目录共存", () => {
 
 		const text = result.content[0].text;
 		// processor 子目录与 context distill 的 /tmp/pi-distill/ 不冲突
-		expect(text).toContain("/tmp/pi-distill/processor/");
+		expect(text).toContain(".pi/agent/distill/processor/");
 	});
 });
 

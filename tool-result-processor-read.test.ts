@@ -44,7 +44,7 @@ describe("processor read 处理", () => {
 		const text = result.content[0].text;
 		expect(text).toContain("file content here");
 		expect(text).toContain("原文：");
-		expect(text).toContain("/tmp/pi-distill/processor/");
+		expect(text).toContain(".pi/agent/distill/processor/");
 	});
 
 	it("read 大结果走摘要+精读提示", () => {
@@ -64,7 +64,7 @@ describe("processor read 处理", () => {
 		const text = result.content[0].text;
 		expect(text).toContain("[processed]");
 		expect(text).toContain("read");
-		expect(text).toContain("/tmp/pi-distill/processor/");
+		expect(text).toContain(".pi/agent/distill/processor/");
 		expect(text).toContain("完整内容：");
 	});
 

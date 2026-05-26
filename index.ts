@@ -34,7 +34,7 @@ export default function (pi: ExtensionAPI) {
 			try {
 				const fs = require("fs");
 				const path = require("path");
-				const cachePath = path.join("/tmp/pi-distill", "last-payload.json");
+				const cachePath = path.join(require("os").homedir(), ".pi/agent/distill", "last-payload.json");
 				if (fs.existsSync(cachePath)) return JSON.parse(fs.readFileSync(cachePath, "utf-8"));
 			} catch { /* ignore */ }
 			return null;

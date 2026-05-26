@@ -121,7 +121,7 @@ describe("distill 简化：上下文可见性管理", () => {
 		// 全文被替换
 		expect((messages2[1].content as any[]).find((p: any) => p.type === "text")?.text).toContain("[auto-distill]");
 		expect((messages2[1].content as any[]).find((p: any) => p.type === "text")?.text).not.toContain(bigText.slice(0, 100));
-		expect((messages2[1].content as any[]).find((p: any) => p.type === "text")?.text).not.toContain("/tmp/pi-distill/");
+		expect((messages2[1].content as any[]).find((p: any) => p.type === "text")?.text).not.toContain("/tmp/pi-distill/");  // 已迁移到 ~/.pi/agent/distill/
 	});
 
 	it("不超阈值不做任何操作", () => {

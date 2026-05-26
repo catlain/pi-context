@@ -1,9 +1,10 @@
 /** shared.ts — 配置、常量、持久化工具函数。不持有运行时可变状态。 */
 import { join, dirname } from "path";
-import { existsSync, readFileSync, writeFileSync, mkdirSync, readdirSync, rmSync } from "fs";
+import { existsSync, readFileSync, writeFileSync, mkdirSync } from "fs";
 import { fileURLToPath } from "url";
 
-export const DISTILL_DIR = "/tmp/pi-distill";
+/** 持久化根目录：重启不丢失，用于 manifest、录制、缓存 */
+export const DISTILL_DIR = join(process.env.HOME || "/root", ".pi/agent/distill");
 
 // ── Hints 模板配置 ──
 export interface HintsConfig {

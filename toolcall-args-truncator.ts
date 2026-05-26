@@ -6,10 +6,10 @@
  */
 import { writeFileSync, mkdirSync } from "node:fs";
 import { join } from "path";
-import { tmpdir } from "os";
+import { DISTILL_DIR } from "./shared.js";
 import { estimateTokens } from "./distill-helpers.js";
 
-const TOOLCALL_PROCESSOR_DIR = join(tmpdir(), "pi-distill", "processor");
+const TOOLCALL_PROCESSOR_DIR = join(DISTILL_DIR, "processor");
 
 /** 小字段保留阈值（字符数），超过此值的字段不保留 */
 const SMALL_FIELD_CHAR_LIMIT = 200;

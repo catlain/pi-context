@@ -1,6 +1,7 @@
-/** 命令注册：/record、/distill-config、/processor-config */
+/** 命令注册：/record、/distill-config、/processor-config、/context-clean */
 import { type ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import { setRecording, isRecording, cleanRecordings, getContextConfig, setContextConfig } from "./shared.js";
+import { cleanContextData, listSessionData } from "./clean.js";
 
 export function registerRecordCommand(pi: ExtensionAPI) {
 	pi.registerCommand("record", {
@@ -14,9 +15,35 @@ export function registerRecordCommand(pi: ExtensionAPI) {
 			if (on) {
 				const cleaned = cleanRecordings();
 				const extra = cleaned > 0 ? `（已清理 ${cleaned} 个旧文件）` : "";
-				ctx.ui.notify(`⏺ Payload 录制已开启${extra}，文件写入 /tmp/pi-distill/recordings`, "info");
+				ctx.ui.notify(`⏺ Payload 录制已开启${extra}`, "info");
 			} else {
 				ctx.ui.notify("⏹ Payload 录制已关闭", "info");
+			}
+		},
+	});
+}
+
+export function registerContextCleanCommand(pi: ExtensionAPI) {
+	pi.registerCommand("context-clean", {
+		description: "清理 context 扩展持久化数据。/context-clean [sessionId] — 指定会话ID只清理该会话；不传参清理全部。",
+		handler: async (args, ctx) => {
+			const sid = args?.trim() ?? "";
+			if (sid) {
+				const { cleaned, freedMB } = cleanContextData(sid);
+				if (cleaned > 0) {
+					ctx.ui.notify(`🧹 已清理会话 ${sid} 的数据（释放 ${freedMB} MB）`, "info");
+				} else {
+					ctx.ui.notify(`会话 ${sid} 无数据可清理`, "info");
+				}
+			} else {
+				const sessions = listSessionData();
+				if (sessions.length === 0) {
+					ctx.ui.notify("无持久化数据可清理", "info");
+					return;
+				}
+				const totalMB = sessions.reduce((s, x) => s + x.sizeMB, 0);
+				cleanContextData();
+				ctx.ui.notify(`🧹 已清理全部 ${sessions.length} 个会话数据（释放 ${Math.round(totalMB * 100) / 100} MB）`, "info");
 			}
 		},
 	});

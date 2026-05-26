@@ -6,9 +6,10 @@
 
 import { writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { join } from "node:path";
-import { tmpdir } from "node:os";
+import { DISTILL_DIR } from "./shared.js";
 
-export const PROCESSOR_DIR = join(tmpdir(), "pi-distill", "processor");
+/** processor 原文存入持久化目录，重启后路径仍有效 */
+export const PROCESSOR_DIR = join(DISTILL_DIR, "processor");
 
 // ── bash 原文路径提取 ────────────────────────────
 
