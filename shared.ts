@@ -53,7 +53,6 @@ export function fillTemplate(
 ): string {
 	return template.replace(/\{(\w+)\}/g, (_, key) => vars[key] ?? `{${key}}`);
 }
-export const RECORDINGS_DIR = join(DISTILL_DIR, "recordings");
 export const MSG_CACHE = join(DISTILL_DIR, "last-messages.json");
 export const PAYLOAD_CACHE = join(DISTILL_DIR, "last-payload.json");
 
@@ -93,21 +92,6 @@ export const setContextConfig = (
 	patch: Partial<ContextConfig>,
 ): ContextConfig =>
 	patchSettingsSection<ContextConfig>("context", patch, DEFAULT_CONFIG);
-
-// ── 录制 ──
-let recording = false;
-export function isRecording() {
-	return recording;
-}
-export function setRecording(v: boolean) {
-	recording = v;
-}
-export function cleanRecordings() {
-	if (existsSync(RECORDINGS_DIR)) {
-		for (const f of readdirSync(RECORDINGS_DIR))
-			rmSync(join(RECORDINGS_DIR, f), { recursive: true, force: true });
-	}
-}
 
 // ── 文件缓存读写 ──
 function safeReadFileSync(p: string) {

@@ -3,11 +3,10 @@ import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import { cleanContextData, listSessionData } from "./clean.js";
 import {
 	cleanRecordings,
-	getContextConfig,
 	isRecording,
-	setContextConfig,
 	setRecording,
-} from "./shared.js";
+} from "./recording.js";
+import { getContextConfig, setContextConfig } from "./shared.js";
 
 export function registerRecordCommand(pi: ExtensionAPI) {
 	pi.registerCommand("record", {
