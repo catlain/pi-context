@@ -32,7 +32,7 @@ describe("mcp-lite 不再做格式化", () => {
 		const fs = await import("node:fs");
 		const path = await import("node:path");
 		const mcpIndex = fs.readFileSync(
-			path.resolve(__dirname, "../../extensions/mcp-lite/index.ts"), "utf-8",
+			path.resolve(process.env.HOME || "/root", ".pi/agent/extensions/mcp-lite/index.ts"), "utf-8",
 		);
 		// 不应包含 processResponse 调用（setupMcpLite 和 autoDiscoverMissingServers 两条路径）
 		expect(mcpIndex).not.toContain("processResponse");
