@@ -10,8 +10,8 @@ import {
 	buildProviderToolCallIndex,
 	classifyStatus,
 	readJsonFile, RECORDINGS_DIR,
-	listSessions, listRecordings,
 } from "./core.js";
+import { listSessions, listRecordings } from "./files-core.js";
 import {
 	listRecordingFiles, getRecordingFiles,
 	collectTimeline, collectTimelineByTcId,

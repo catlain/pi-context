@@ -32,7 +32,7 @@ vi.mock("../../payload/core.js", () => ({
 	RECORDINGS_DIR: "/tmp/test-recordings",
 }));
 
-import { doExpensive } from "../expensive.js";
+import { doExpensive } from "../../payload/expensive.js";
 
 describe("doExpensive", () => {
 	it("空 files 列表返回提示信息", () => {
