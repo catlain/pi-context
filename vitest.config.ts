@@ -1,23 +1,17 @@
 import path from "node:path";
-import { defineConfig } from "vitest/config";
+import { createConfig } from "../vitest.config.base";
 
-const globalNodeModules =
-	"/home/lain/.local/share/fnm/node-versions/v22.22.2/installation/lib/node_modules";
-const piAgentModules = "/home/lain/.pi/agent/npm/node_modules";
+export default createConfig({
+	alias: {
+		"@earendil-works/pi-coding-agent": true,
+		"@pi-atelier/shared-utils": path.resolve(__dirname, "../pi-shared-utils"),
+		"@pi-atelier/context-manager": path.resolve(__dirname, "./lib"),
+	"typebox": path.resolve(__dirname, "node_modules/@sinclair/typebox/build/esm/index.mjs"),
 
-export default defineConfig({
-	resolve: {
-		alias: {
-			"@earendil-works/pi-coding-agent": path.resolve(
-				globalNodeModules,
-				"@earendil-works/pi-coding-agent/dist/index.js",
-			),
-			typebox: path.resolve(piAgentModules, "@sinclair/typebox/build/cjs/index.js"),
-		},
 	},
+	fileParallelism: false,
+	include: ["tests/**/*.test.ts"],
 	test: {
-		include: ["**/*.test.ts", "tests/**/*.test.ts"],
-		environment: "node",
 		testTimeout: 10000,
 	},
 });

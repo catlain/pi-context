@@ -10,7 +10,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@pi-atelier/shared-utils": "github:catlain/pi-shared-utils"
+    "@pi-atelier/shared-utils": "github:catlain/pi-shared-utils",
+    "@sinclair/typebox": "^0.34.49"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.15",
