@@ -70,7 +70,7 @@ export function registerDistillConfigCommand(pi: ExtensionAPI) {
 			if (!arg) {
 				const cfg = getContextConfig();
 				ctx.ui.notify(
-					`[distill-config] distillThreshold = ${cfg.distillThreshold} tokens\nfirstSeenCap = ${cfg.firstSeenCap} tokens（0 = 不设上限）`,
+					`[distill-config]\n  distillThreshold = ${cfg.distillThreshold} tokens\n  firstSeenCap = ${cfg.firstSeenCap} tokens（0 = 不设上限）\n\n用法:\n  /distill-config 1500         # 设置 distill 阈值\n  /distill-config --cap 20000  # 设置首次全文上限\n  /distill-config --cap 0      # 禁用首次全文上限`,
 					"info",
 				);
 				return;
