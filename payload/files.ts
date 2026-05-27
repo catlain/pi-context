@@ -9,8 +9,8 @@ import {
 	buildProviderToolCallIndex,
 	classifyStatus,
 	readJsonFile, RECORDINGS_DIR,
-	listSessions,
 } from "./core.js";
+import { listSessions } from "./files-core.js";
 
 // ════════════════════════════════════════════════════════════
 // 文件列表
