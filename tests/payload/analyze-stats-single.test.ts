@@ -45,7 +45,8 @@ vi.mock("../../payload/files.js", () => {
 	};
 });
 
-import { doStats, doSingle } from "../../payload/analyze.js";
+import { doSingle } from "../../payload/analyze.js";
+import { doStats } from "../../payload/stats.js";
 
 beforeEach(() => { mkdirSync(RECORDINGS_TMP, { recursive: true }); });
 afterEach(() => { rmSync(TMP, { recursive: true, force: true }); });

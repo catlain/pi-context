@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { parseDistillHeader, parseArgs, extractReadPath, formatToolStats } from "../../payload/core.js";
+import { parseDistillHeader, parseArgs, extractReadPath } from "../../payload/core.js";
+import { formatToolStats } from "../../payload/format.js";
 
 describe("parseDistillHeader", () => {
 	it("完整 header 解析", () => {

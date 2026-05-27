@@ -139,22 +139,12 @@ export function readJsonFile<T = any>(filepath: string): T | null {
 	catch { return null; }
 }
 
-// ── 格式化输出 ──
+// ── 追踪链折叠输出 ──
 
-export function formatToolStats(perTool: Record<string, {
-	count: number; callTokens: number; resultTokens: number;
-}>): string {
-	if (!perTool || Object.keys(perTool).length === 0) return "";
-	const lines = [
-		"\n📊 按工具统计:",
-		`   ${"Tool".padEnd(25)} ${"Calls".padStart(5)} ${"CallT".padStart(8)} ${"ResultT".padStart(8)} ${"Total".padStart(8)}`,
-		`   ${"─".repeat(25)} ${"─".repeat(5)} ${"─".repeat(8)} ${"─".repeat(8)} ${"─".repeat(8)}`,
-	];
-	const sorted = Object.entries(perTool)
-		.sort((a, b) => (b[1].callTokens + b[1].resultTokens) - (a[1].callTokens + a[1].resultTokens));
-	for (const [name, s] of sorted) {
-		const total = s.callTokens + s.resultTokens;
-		lines.push(`   ${name.padEnd(25)} ${String(s.count).padStart(5)} ${fmtTok(s.callTokens).padStart(8)} ${fmtTok(s.resultTokens).padStart(8)} ${fmtTok(total).padStart(8)}`);
-	}
-	return lines.join("\n");
+export interface ChainEntry {
+	req: string;
+	idx: number;
+	status: string;
+	tokens: number;
+	preview: string;
 }

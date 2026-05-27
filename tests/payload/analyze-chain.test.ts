@@ -31,6 +31,30 @@ vi.mock("../../payload/core.js", () => {
 		RECORDINGS_DIR: rd,
 		listSessions: () => [],
 		listRecordings: () => [],
+		foldChainEntries: (entries: any[]) => {
+			if (entries.length === 0) return [];
+			const lines: string[] = [];
+			let i = 0;
+			while (i < entries.length) {
+				const cur = entries[i];
+				const marker = ({ FULL_KEPT: "📖全文", TRUNCATED: "✂️截断" } as any)[cur.status] ?? "📝小";
+				let j = i + 1;
+				while (
+					j < entries.length &&
+					entries[j].status === cur.status &&
+					entries[j].tokens === cur.tokens &&
+					entries[j].preview.slice(0, 40) === cur.preview.slice(0, 40)
+				) j++;
+				const count = j - i;
+				if (count === 1) {
+					lines.push(`    req-${cur.req} [${String(cur.idx).padStart(4)}] ${marker} ${cur.status.padEnd(12)} ${String(cur.tokens).padStart(5)}tok ${cur.preview.slice(0, 60)}`);
+				} else {
+					lines.push(`    req-${cur.req}~${entries[j - 1].req} (${count}个) ${marker} ${cur.status.padEnd(12)} ${String(cur.tokens).padStart(5)}tok ${cur.preview.slice(0, 60)}`);
+				}
+				i = j;
+			}
+			return lines;
+		},
 	};
 });
 
@@ -108,7 +132,8 @@ vi.mock("../../payload/files.js", async () => {
 	};
 });
 
-import { doChain, doChainTcId } from "../../payload/analyze.js";
+import { doChain } from "../../payload/analyze.js";
+import { doChainTcId } from "../../payload/stats.js";
 
 beforeEach(() => { mkdirSync(RECORDINGS_TMP, { recursive: true }); });
 afterEach(() => { rmSync(TMP, { recursive: true, force: true }); });

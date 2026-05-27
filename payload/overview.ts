@@ -5,8 +5,9 @@
 import {
 	estTokens, fmtTok, fmtSize, getText,
 	buildProviderToolCallIndex, classifyStatus,
-	parseDistillHeader, parseArgs, readJsonFile, formatToolStats,
+	parseDistillHeader, parseArgs, readJsonFile,
 } from "./core.js";
+import { formatToolStats } from "./format.js";
 
 export function doOverview(payloadPath: string, verbose = false): string {
 	const data = readJsonFile(payloadPath);
