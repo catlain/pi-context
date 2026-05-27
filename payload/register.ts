@@ -13,10 +13,9 @@ import {
 	doSingle,
 	doOverview,
 	doChain,
-	doChainTcId,
-	doStats,
 	doDiff,
 } from "./analyze.js";
+import { doChainTcId, doStats } from "./stats.js";
 import { doBudget, doGrowth, doExpensive } from "./metrics.js";
 import { doMessages } from "./messages.js";
 import { DISTILL_DIR } from "../shared.js";
