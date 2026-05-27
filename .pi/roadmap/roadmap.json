@@ -63,7 +63,7 @@
       "id": "E5.S2",
       "title": "工具输出自治理 — 各工具自身控制输出质量，processor 退为兜底",
       "description": "## 架构分析\n\n```\nMCP Server (第三方)  →  mcp-lite (execute 透传)  →  processor (tool_result 截断)\n                           ↑                              ↑\n                        应该在这里做                    只做兜底\n                        输出后处理\n```\n\n**当前问题**：mcp-lite `execute` 纯透传 MCP server 返回值，没有任何后处理。processor 在下游 tool_result 阶段只能做粗暴截断。\n\n**正确架构**：mcp-lite 知道每个工具的 server 来源（godot / glm-web / code-graph），应该在 execute 返回前做精准后处理：\n- Godot：过滤默认值属性、限制场景树递归深度\n- GLM web reader：截断过长网页内容\n- code-graph：已有自身截断，OK\n\nprocessor 退为纯阈值兜底（字符数/token 超限才截断），不做格式嗅探。\n\n## 改动位置\n\n| Task | 改动位置 | 说明 |\n|------|---------|------|\n| T1 | mcp-lite `execute` 后处理 | Godot server 输出过滤 |\n| T2 | mcp-lite `execute` 后处理 | GLM web 输出截断 |\n| T3 | pi-session-analyzer | 自有工具输出控制 |\n| T4 | pi-context-manager processor | 移除 formatter，只保留阈值兜底 |\n| T5 | pi-shepherd | jiti 缓存清理 |",
-      "status": "todo",
+      "status": "done",
       "createdDate": "2026-05-27",
       "tasks": [
         {
@@ -119,11 +119,15 @@
         {
           "id": "E5.S2.T6",
           "title": "精简 payload-analyzer 10 个 action 的输出，去除冗余",
-          "status": "todo",
+          "status": "done",
           "priority": "medium",
-          "createdDate": "2026-05-27"
+          "createdDate": "2026-05-27",
+          "doneDate": "2026-05-27",
+          "doneBySessionId": "2026-05-27T03-07-27-126Z_019e6766-be16-73e6-b9dd-f49fd5a28fd1",
+          "note": "已合并到 E5.S4.T3 完成审查：expensive topN 20→10，overview 冗余由 messages action 解决，其余无需改"
         }
-      ]
+      ],
+      "doneDate": "2026-05-27"
     },
     {
       "id": "E5.S3",
@@ -175,6 +179,75 @@
         }
       ],
       "doneDate": "2026-05-27"
+    },
+    {
+      "id": "E5.S4",
+      "title": "全面审查并精简所有自定义工具输出",
+      "description": "全面审查所有自定义工具的输出格式，逐个优化冗余列、过长预览、重复信息。\n\n## 审查结果\n\n| 工具 | 问题 | 优先级 |\n|------|------|--------|\n| session_analyze entries | type列99%冗余、role列12字符浪费、preview 100字符太长、行号padStart(4)浪费 | P0 |\n| session_analyze timeline | 合理，暂不改 | - |\n| session_analyze chain/digest | 合理，暂不改 | - |\n| session_search grep | 每个匹配完整摘要太长 | P1 |\n| roadmap_list/show/next | 格式良好 | OK |\n| memory_index | 表格清晰 | OK |\n| schedule | 极简 | OK |\n| code-graph 系列 | 外部工具控制 | 不可改 |\n\n## 改动计划\n\n按工具逐个 Task，每个 Task 包含：分析 → 改代码 → 测试验证。\n\n### entries 紧凑模式（P0）\n当前输出：`   2 | message  | toolResult   | 05-27 11:42:17 | errors=$(echo...`\n目标输出：`[2]  toolRes  11:42  errors=$(echo...`\n\n改动：\n- 去掉 `type` 列（99% 都是 message）\n- role 缩写：assistant→asst, toolResult→toolRes, user→user\n- 时间只保留 HH:MM（去掉日期秒数）\n- 预览缩到 60 字符\n- 行号用 `[N]` 格式\n- 加 `compact` 参数默认 true，旧格式用 compact=false 兜底\n\n### session_search grep（P1）\n- 每个匹配摘要缩到 80 字符\n- 会话 ID 用短格式（最后两段 UUID）",
+      "status": "done",
+      "createdDate": "2026-05-27",
+      "tasks": [
+        {
+          "id": "E5.S4.T1",
+          "title": "精简 session_analyze entries 输出 — compact 模式",
+          "status": "done",
+          "priority": "high",
+          "createdDate": "2026-05-27",
+          "doingDate": "2026-05-27",
+          "doneDate": "2026-05-27",
+          "doneBySessionId": "2026-05-27T03-07-27-126Z_019e6766-be16-73e6-b9dd-f49fd5a28fd1",
+          "note": "session_analyze entries compact 紧凑格式。commit 92efb7c6。153 passed ✅"
+        },
+        {
+          "id": "E5.S4.T2",
+          "title": "精简 session_search grep 输出 — 摘要缩短 + 短会话 ID",
+          "status": "done",
+          "priority": "medium",
+          "createdDate": "2026-05-27",
+          "doneDate": "2026-05-27",
+          "doneBySessionId": "2026-05-27T03-07-27-126Z_019e6766-be16-73e6-b9dd-f49fd5a28fd1",
+          "note": "grep 匹配上下文 ±40→±25、摘要截断 200→80、firstMsg 60→40、换行符清理、分隔符简化"
+        },
+        {
+          "id": "E5.S4.T3",
+          "title": "审查 payload_analyze 10 个 action 输出冗余（E5.S2.T6 复活）",
+          "status": "done",
+          "priority": "medium",
+          "createdDate": "2026-05-27",
+          "doneDate": "2026-05-27",
+          "doneBySessionId": "2026-05-27T03-07-27-126Z_019e6766-be16-73e6-b9dd-f49fd5a28fd1",
+          "note": "审查全部 10 action：overview 冗余已由 messages action 解决，expensive topN 20→10，其余无需改动"
+        },
+        {
+          "id": "E5.S4.T4",
+          "title": "审查 roadmap/memory/schedule 工具输出 — 确认无需优化",
+          "status": "done",
+          "priority": "low",
+          "createdDate": "2026-05-27",
+          "doneDate": "2026-05-27",
+          "doneBySessionId": "2026-05-27T03-07-27-126Z_019e6766-be16-73e6-b9dd-f49fd5a28fd1",
+          "note": "roadmap_list（已折叠）、memory_index（表格清晰）、schedule（极简）均无需优化"
+        }
+      ],
+      "doneDate": "2026-05-27"
+    },
+    {
+      "id": "E5.S5",
+      "title": "aging 豁免技能文件 — read 技能内容不遗忘",
+      "description": "当 AI 用 read 工具读取技能文件（SKILL.md 及 references 目录下的参考文件）时，aging 不应淘汰这些 toolResult。\n\n**原因**：技能文件通常 1-5K tokens，占用小但对 AI 行为至关重要。AI 读一次技能文件后，该内容应该一直留在上下文里。\n\n**方案**：在 handle-context.ts 的 aging 循环中，通过 toolCallMap 反查 read 调用的 path 参数，如果路径匹配技能目录模式则跳过 aging。\n\n**路径模式**：\n- ~/.pi/agent/skills/{name}/**（内联技能）\n- ~/.pi/agent/npm/node_modules/{pkg}/skills/{name}/**（npm 技能）\n\n**改动**：约 10 行代码 + 测试。无需配置开关（用户明确\"读到就留\"）。",
+      "status": "todo",
+      "createdDate": "2026-05-27",
+      "tasks": [
+        {
+          "id": "E5.S5.T1",
+          "title": "实现技能文件 aging 豁免逻辑 + 完整测试覆盖",
+          "status": "doing",
+          "priority": "high",
+          "createdDate": "2026-05-27",
+          "doingDate": "2026-05-27",
+          "doingSessionId": "2026-05-27T02-23-17-424Z_019e673e-4fb0-72b9-b6c8-8fe3d2648f90"
+        }
+      ]
     }
   ]
 }

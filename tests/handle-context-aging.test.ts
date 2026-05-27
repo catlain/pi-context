@@ -31,6 +31,7 @@ vi.mock("../shared.js", () => ({
 vi.mock("../distill-helpers.js", () => ({
 	buildToolCallMap: () => new Map(),
 	estimateTokens: (t: string) => Math.ceil(t.length / 4),
+	isSkillFilePath: () => false,
 	toolMeta: () => ({ meta: "" }),
 	removeOrphanedToolCalls: (msgs: any[]) => {
 		const activeIds = new Set<string>();

@@ -2,6 +2,7 @@
 import {
 	buildToolCallMap,
 	estimateTokens,
+	isSkillFilePath,
 	removeOrphanedToolCalls,
 	toolMeta,
 } from "./distill-helpers.js";
@@ -106,6 +107,11 @@ export function handleContextEvent(
 		const effectiveThreshold =
 			origTokens >= distillThreshold ? 2 : agingThreshold;
 		if (effectiveThreshold <= 0) continue; // aging 关闭时跳过普通结果
+
+		// 技能文件豁免：read 调用技能路径时永不 aging
+		const callInfo = toolCallMap.get(tcId);
+		if (toolName === "read" && isSkillFilePath(callInfo?.arguments?.path))
+			continue;
 
 		activeTcIds.add(tcId);
 		const count = (agingTracker.get(tcId) || 0) + 1;
