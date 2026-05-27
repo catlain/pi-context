@@ -11,6 +11,7 @@ import registerContextCommand from "./context.js";
 import { type ContextState, handleContextEvent } from "./handle-context.js";
 import { isRecording, RECORDINGS_DIR } from "./recording.js";
 import { DISTILL_DIR, loadManifest, PAYLOAD_CACHE } from "./shared.js";
+import { registerToolResultProcessor } from "./tool-result-processor.js";
 
 export default function (pi: ExtensionAPI) {
 	// ── 闭包状态 ──
@@ -112,6 +113,9 @@ export default function (pi: ExtensionAPI) {
 			/* ignore — 录制不应影响主流程 */
 		}
 	});
+
+	// ── 注册 tool_result handler（工具输出后处理/压缩）──
+	registerToolResultProcessor(pi);
 
 	// ── 注册命令 ──
 	registerContextCommand(pi, stateRef);
