@@ -4,9 +4,52 @@
  * 纯函数，解析失败时返回 fallback 文本。
  */
 
+// ── code-graph result types ──────────────────────
+
+interface SearchResultItem {
+	type?: string;
+	name: string;
+	file_path?: string;
+	start_line?: number;
+	signature?: string;
+}
+
+interface CallGraphNode {
+	function: string;
+	callers?: Array<{ name: string; file_path?: string; depth?: number }>;
+	callees?: Array<{ name: string; file_path?: string; depth?: number }>;
+	test_callers_filtered?: number;
+}
+
+interface ReferencesResult {
+	total_references: number;
+	symbol: string;
+	by_relation?: Record<string, number>;
+	references?: Array<{ relation?: string; name: string; file_path?: string; start_line?: number }>;
+}
+
+interface ModuleOverviewResult {
+	path: string;
+	files_count?: number;
+	summary?: string;
+	active_exports?: Array<{ type?: string; name: string; file?: string; start_line?: number; caller_count?: number; signature?: string }>;
+	inactive_summary?: Array<{ type?: string; count: number; names?: string[] }>;
+}
+
+interface ProjectMapResult {
+	modules?: Array<{ path: string; files?: number; functions?: number; key_symbols?: string[] }>;
+	module_dependencies?: Array<{ from: string; to: string }>;
+	hot_functions?: Array<{ name: string; file?: string; caller_count?: number }>;
+}
+
+interface AstSearchResult {
+	count?: number;
+	results?: Array<{ type?: string; name: string; file_path?: string; start_line?: number; signature?: string }>;
+}
+
 // ── semantic_code_search ─────────────────────────
 
-export function formatSearchJson(arr: any[]): string {
+export function formatSearchJson(arr: SearchResultItem[]): string {
 	return arr
 		.map((item) => {
 			const parts: string[] = [];
@@ -20,7 +63,7 @@ export function formatSearchJson(arr: any[]): string {
 
 // ── get_call_graph ───────────────────────────────
 
-export function formatCallGraphJson(obj: any): string {
+export function formatCallGraphJson(obj: CallGraphNode): string {
 	const lines: string[] = [obj.function];
 	if (obj.callers?.length > 0) {
 		lines.push("CALLERS:");
@@ -39,7 +82,7 @@ export function formatCallGraphJson(obj: any): string {
 
 // ── find_references ──────────────────────────────
 
-export function formatReferencesJson(obj: any): string {
+export function formatReferencesJson(obj: ReferencesResult): string {
 	const lines: string[] = [`${obj.total_references} references to '${obj.symbol}'`];
 	if (obj.by_relation && typeof obj.by_relation === "object") {
 		const stats = Object.entries(obj.by_relation).map(([k, v]) => `${k}: ${v}`).join(", ");
@@ -52,7 +95,7 @@ export function formatReferencesJson(obj: any): string {
 
 // ── module_overview ──────────────────────────────
 
-export function formatModuleOverviewJson(obj: any): string {
+export function formatModuleOverviewJson(obj: ModuleOverviewResult): string {
 	const lines: string[] = [];
 	if (obj.summary) lines.push(obj.summary);
 	else lines.push(`Module '${obj.path}': ${obj.files_count} files`);
@@ -78,7 +121,7 @@ export function formatModuleOverviewJson(obj: any): string {
 
 // ── project_map ──────────────────────────────────
 
-export function formatProjectMapJson(obj: any): string {
+export function formatProjectMapJson(obj: ProjectMapResult): string {
 	const lines: string[] = [];
 	const modules = obj.modules ?? [];
 	if (modules.length > 0) {
@@ -102,7 +145,7 @@ export function formatProjectMapJson(obj: any): string {
 
 // ── ast_search ───────────────────────────────────
 
-export function formatAstSearchJson(obj: any): string {
+export function formatAstSearchJson(obj: AstSearchResult): string {
 	const results = obj.results ?? [];
 	if (results.length === 0) return JSON.stringify(obj);
 	const lines: string[] = [`${obj.count ?? results.length} results:`];
